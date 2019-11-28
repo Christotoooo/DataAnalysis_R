@@ -23,7 +23,7 @@ library(readr)
 library(knitr)
 
 # Read data and select fields
-Womens_Clothing_Reviews <- read_csv("D:/PERSONAL/McGill/McGill/McGill Current/MATH 208/assignments/R_final_project/Womens_Clothing_Reviews.csv")
+Womens_Clothing_Reviews <- read_csv("D:/PERSONAL/McGill/McGill/McGill Current/MATH 208/assignments/DataAnalysis_R/R_final_project/Womens_Clothing_Reviews.csv")
 data <- Womens_Clothing_Reviews[c("Review_ID","Clothing_ID","Age","Rating","Recommended","Department_Name")]
 ```
 
@@ -152,12 +152,22 @@ ggplot(data,aes(x=Age,fill=Department_Name)) +
  ylab("Number of reviews")
 ```
 
+
 ```{r,warning=FALSE}
 # density plot
 ggplot(data,aes(x=Age,fill=Department_Name)) +
  geom_density(position="dodge") + facet_wrap(~Department_Name) + scale_fill_viridis_d() +
  ylab("Density of reviews")
 ```
+
+
+```{r,warning=FALSE}
+# boxplot plot
+ggplot(data,aes(y=Age)) +
+ geom_boxplot() + facet_wrap(~Department_Name) + scale_fill_viridis_d() +
+ ylab("Age")
+```
+
 
 
 #### To numberically document the distributions, we bind the statistics into one table as follows. We can tell that even though we claim that the distributions are very similar according to the graphs, they have various means and medians. For instance, Tops' mean age surpasses that of Intimate by almost 3 years old. Nonetheless, these nuances are negligible and we can state that the distribution of age of reviews does not quite vary across product departments.
