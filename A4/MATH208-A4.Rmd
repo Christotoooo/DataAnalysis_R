@@ -1,0 +1,90 @@
+---
+title: "MATH208-A4"
+author: "Christopher Zheng. ID: 260760794"
+date: "15/11/2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+ceramic_data<-dget("ceramic.txt")
+```
+
+
+(a) What class of object is ceramic_data?
+```{r}
+class(ceramic_data)
+```
+
+(b) Using the ceramic_data object, compute the median Mean_Strength by Batch, i.e. write a line of
+code that produces a vector that computes the mean of all observations in each batch, respectively.
+What is the difference in mean by Batch?
+```{r}
+# Batch 1
+# avg_batch_1 <- sum(ceramic_data[1:2,1:2,1:2,1:2,1:1][1:16]) / 16
+# Batch 2
+# avg_batch_2 <- sum(ceramic_data[1:2,1:2,1:2,1:2,2:2][1:16]) / 16
+# difference <- abs(avg_batch_1 - avg_batch_2)
+# avg_vector <- c(avg_batch_1,avg_batch_2)
+# print(avg_vector)  # the vector of the two averages
+# print(difference)  # the absolute difference between two mean values
+m_by_Batch <- apply(ceramic_data, c(5), median)
+print(m_by_Batch)
+diff_by_Batch <- unname(m_by_Batch[1] - m_by_Batch[2])
+print(diff_by_Batch)
+```
+
+(c) Compute the overall standard deviation of the Mean_Strength values across all 32 observations.
+Hint: remember that this type of object is stored internally as an generic vector.
+```{r}
+all_obs <- c(ceramic_data[1:2,1:2,1:2,1:2,1:2][1:32])
+std_dev <- sd(all_obs)
+print(std_dev)
+```
+
+(d) Using the ceramic_data object, compute the average Mean_Strength for each of the four groups
+defined by the cross-classification of Table_Speed and Direction. Hint: the most succinct way to do
+this would return a 2x2 table with Table_Speed levels in the rows and Direction levels in the columns.
+
+```{r}
+#sum_table <- ceramic_data[,1,1,,1] + ceramic_data[,2,1,,1] + ceramic_data[,1,2,,1] + ceramic_data[,1,1,,2] + 
+#  ceramic_data[,1,2,,2] + ceramic_data[,2,2,,1] + ceramic_data[,2,1,,2] + ceramic_data[,2,2,,2]
+#output_table <- sum_table / 8
+output_table <- apply(ceramic_data, c(1,4), mean)
+print(output_table)
+```
+
+(e) Compute the difference in means between the Longitudinal and Transverse levels of Direction for each
+level of Slow and Fast separately. Hint: Use part (d) and the apply function.
+```{r}
+# helper function to calculate the difference of the means and to return the absoluate value of the difference
+abs_diff <-function(x){
+  return(abs(x[[1]]-x[[2]]))
+}
+# apply the difference function horizontally
+apply(output_table,1,abs_diff)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
