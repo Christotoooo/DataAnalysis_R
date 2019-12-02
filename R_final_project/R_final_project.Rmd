@@ -1,5 +1,5 @@
 ---
-title: "R_final_project"
+title: "Final Project in R"
 author: "Christopher Zheng - 260760794"
 date: "19/11/2019"
 output:
@@ -33,12 +33,11 @@ data <- Womens_Clothing_Reviews[c("Review_ID","Clothing_ID","Age","Rating","Reco
 # Task 1
 
 ### *Summary of "Age"*
-#### The "Age" denotes the age of the reviewer in an integer. This variable spans from 18 to 99 and has a relatively right-skewed distribution as shown by the density plot below. A large proportion of the age values fall between 35 and 45 containing the mean (43.2) and median (41), and this age interval represents the group of people who are into leaving product reviews the most.
+#### The "Age" denotes the age of the reviewer in an integer. This variable spans from 18 to 99 and has a relatively right-skewed distribution as shown by the density-histogram plot below. A large proportion of the age values fall between 35 and 45 containing the mean (43.2) and median (41), and this age interval represents the group of people who are into leaving product reviews the most.
 
 ```{r}
 # Plot
-ggplot(data,aes(x=Age)) + geom_density() +
- xlab("Age") + ylab("Density of Age")
+ggplot(data,aes(x=Age)) + geom_density(col="blue") + geom_histogram(aes(y=..density..),bins=30,col="black",alpha=0.3) + xlab("Age") + ylab("Density of Age or Number")
 
 # Summary table
 data %>% summarise(Avg = mean(Age),
@@ -62,7 +61,7 @@ data %>% summarise(Avg = mean(Age),
 ggplot(data,aes(x=Rating)) + geom_bar(col='black',fill="lightblue") +
  xlab("Product Rating") + ylab("Number of ratings")
 
-# Summary table
+# Summary table 1
 data %>% summarise(Avg = mean(Rating),
                     Med = median(Rating),
                     '25%ile' = quantile(Rating,0.25),
@@ -70,6 +69,10 @@ data %>% summarise(Avg = mean(Rating),
                     StD = sd(Age),
                     IQR = IQR(Age)
                     ) %>% kable()
+
+# Summary table 2
+data %>% group_by(Rating) %>% summarise(count=n()) %>%
+mutate(prop=count/sum(count)) %>% arrange(desc(prop)) %>% kable()
 
 ```
 
@@ -117,13 +120,8 @@ counter <- function(x){
 
 
 # Summary table
-data %>% summarise(Bottoms = counter("Bottoms"),
-                   Dresses = counter("Dresses"),
-                   Intimate = counter("Intimate"),
-                   Jackets = counter("Jackets"),
-                   Tops = counter("Tops"),
-                   Trend = counter("Trend"),
-                   Missing = length(data$Department_Name) - Bottoms - Dresses - Intimate - Jackets - Tops - Trend) %>% kable()
+data %>% group_by(Department_Name) %>% summarise(count=n()) %>%
+mutate(prop=count/sum(count)) %>% arrange(desc(prop)) %>% kable()
 
 ```
 
@@ -133,6 +131,7 @@ data %>% summarise(Bottoms = counter("Bottoms"),
 ```{r}
 # Remove rows whose department names are not the listed six valid departments.
 data <- data[!is.na(data$Department_Name),]
+dim(data)
 ```
 
 
@@ -142,7 +141,7 @@ data <- data[!is.na(data$Department_Name),]
 
 ### *Q1*
 
-#### If we separate the six departments apart w.r.t. to Age as in the following diagrams, we can tell that the six departments' products are not equally popular under one scale in the barplot: Tops and Dresses received the largest number of reviews, whereas Trend the smallest, which is almost unnoticeable. However, if we graph the same data in a set of density plots, we discover that the distributions of the six departments' product reviews are similar to a large extent.
+#### If we separate the six departments apart w.r.t. to Age as in the following diagrams, we can tell that the six departments' products are not equally popular under one scale in the barplot: Tops and Dresses received the largest number of reviews, whereas Trend the smallest, which is almost unnoticeable. 
 
 ```{r}
 # graphical
@@ -152,6 +151,7 @@ ggplot(data,aes(x=Age,fill=Department_Name)) +
  ylab("Number of reviews")
 ```
 
+#### However, if we graph the same data in a set of density plots, we discover that the distributions of the six departments' product reviews are similar to a large extent.
 
 ```{r,warning=FALSE}
 # density plot
@@ -160,12 +160,11 @@ ggplot(data,aes(x=Age,fill=Department_Name)) +
  ylab("Density of reviews")
 ```
 
+#### Our proposition can be further confirmed if we graph they six onto one plot as follows.
 
-```{r,warning=FALSE}
-# boxplot plot
-ggplot(data,aes(y=Age)) +
- geom_boxplot() + facet_wrap(~Department_Name) + scale_fill_viridis_d() +
- ylab("Age")
+```{r}
+ggplot(data,aes(x=Age,col=Department_Name)) +
+geom_density(size=0.6)
 ```
 
 
@@ -215,7 +214,7 @@ data_copy$Age[data_copy$Age<=25] <- "group1"
 # graphical
 ggplot(data_copy,aes(x=Rating,fill=Age)) +
  geom_bar(position="dodge") + facet_wrap(~Age) + scale_fill_viridis_d() +
- ylab("Number of ratings")
+ ylab("Number of ratings") + xlab("1:25 and under, 2:26 - 35, 3:36-45, 4:46-64, and 5:65 and over")
 ```
 
 ```{r}
@@ -234,7 +233,7 @@ for(i in groups){
                                  IQR = IQR(Rating)
                                  )
   lil_tb <- tbl_df(num_summary)
-  output <- bind_rows(lil_tb,output)
+  output <- bind_rows(output,lil_tb)
 }
 
 kable(output)
